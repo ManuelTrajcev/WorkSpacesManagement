@@ -1,9 +1,9 @@
-package mk.ukim.finki.wp.workspaces.model;
+package mk.ukim.finki.wp.workspaces.model.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import mk.ukim.finki.wp.workspaces.enumerations.Role;
+import mk.ukim.finki.wp.workspaces.model.enumerations.Role;
 
 @Entity
 @Data

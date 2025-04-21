@@ -1,9 +1,8 @@
-package mk.ukim.finki.wp.workspaces.model;
+package mk.ukim.finki.wp.workspaces.model.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,5 +17,11 @@ public class Workspace {
     private String description;
 
     @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL)
-    private List<UserWorkspace> userWorkspaces = new ArrayList<>();
+    private List<UserWorkspace> userWorkspaces;
+
+    public Workspace(String name, String description) {
+        this.name = name;
+        this.description = description;
+        this.userWorkspaces = new ArrayList<>();
+    }
 }
