@@ -1,8 +1,8 @@
 package mk.ukim.finki.wp.workspaces.service.application;
 
-import mk.ukim.finki.wp.workspaces.dto.CreateUserDto;
-import mk.ukim.finki.wp.workspaces.dto.DisplayUserDto;
-import mk.ukim.finki.wp.workspaces.dto.LoginUserDto;
+import mk.ukim.finki.wp.workspaces.model.dto.CreateUserDto;
+import mk.ukim.finki.wp.workspaces.model.dto.DisplayUserDto;
+import mk.ukim.finki.wp.workspaces.model.dto.LoginUserDto;
 
 import java.util.Optional;
 

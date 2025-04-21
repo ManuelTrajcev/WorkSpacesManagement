@@ -1,6 +1,5 @@
-package mk.ukim.finki.wp.workspaces.dto;
+package mk.ukim.finki.wp.workspaces.model.dto;
 
-import mk.ukim.finki.wp.workspaces.model.domain.User;
 import mk.ukim.finki.wp.workspaces.model.domain.Workspace;
 
 public record DisplayWorkspaceDto(

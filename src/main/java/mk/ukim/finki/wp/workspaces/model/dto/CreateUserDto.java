@@ -1,4 +1,4 @@
-package mk.ukim.finki.wp.workspaces.dto;
+package mk.ukim.finki.wp.workspaces.model.dto;
 
 public record CreateUserDto(
         String username,
