@@ -22,4 +22,9 @@ public class UserWorkspace {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    public UserWorkspace(User user, Workspace workspace, Role role) {
+        this.user = user;
+        this.workspace = workspace;
+        this.role = role;
+    }
 }

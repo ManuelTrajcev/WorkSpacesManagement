@@ -1,16 +1,13 @@
 package mk.ukim.finki.wp.workspaces.service.domain.impl;
 import mk.ukim.finki.wp.workspaces.model.domain.User;
-import mk.ukim.finki.wp.workspaces.model.exceptions.InvalidArgumentsException;
-import mk.ukim.finki.wp.workspaces.model.exceptions.InvalidUsernameOrPasswordException;
-import mk.ukim.finki.wp.workspaces.model.exceptions.PasswordsDoNotMatchException;
-import mk.ukim.finki.wp.workspaces.model.exceptions.UsernameAlreadyExistsException;
+import mk.ukim.finki.wp.workspaces.model.exceptions.*;
 import mk.ukim.finki.wp.workspaces.repository.UserRepository;
 import mk.ukim.finki.wp.workspaces.service.domain.UserService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import mk.ukim.finki.wp.workspaces.model.exceptions.InvalidUserCredentialsException;
+
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
@@ -51,11 +48,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User login(String username, String password) {
-        if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
+        if (username == null || username.isEmpty() || password == null || password.isEmpty())
             throw new InvalidArgumentsException();
-        }
-        return userRepository.findByUsernameAndPassword(username, password).orElseThrow(
-                InvalidUserCredentialsException::new);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(username));
+        if (!passwordEncoder.matches(password, user.getPassword()))
+            throw new InvalidUserCredentialsException();
+        return user;
     }
+
 
 }
