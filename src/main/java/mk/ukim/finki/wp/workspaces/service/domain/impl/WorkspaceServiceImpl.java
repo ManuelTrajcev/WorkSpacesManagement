@@ -34,4 +34,9 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         Optional<Workspace> workspace = workspaceRepository.findById(userWorkspace.get().getWorkspace().getId());
         return workspace;
     }
+
+    @Override
+    public Optional<Workspace> findById(Long workspaceId) {
+        return workspaceRepository.findById(workspaceId);
+    }
 }

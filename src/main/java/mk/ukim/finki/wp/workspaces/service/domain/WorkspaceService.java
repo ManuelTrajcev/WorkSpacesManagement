@@ -13,4 +13,6 @@ import java.util.Optional;
 public interface WorkspaceService {
     List<Workspace> findAll();
     Optional<Workspace> openWorkspace(Long workspaceId, Long userId);
+
+    Optional<Workspace> findById(Long workspaceId);
 }

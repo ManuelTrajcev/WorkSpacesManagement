@@ -38,11 +38,11 @@ public class DataInitializer {
 //                passwordEncoder.encode("mt"));
 //        userRepository.save(user1);
 //
-//        Workspace workspace1 = new Workspace(
-//                "workspace1",
-//                "workspace1 description"
+//        Workspace workspace2 = new Workspace(
+//                "workspace2",
+//                "workspace2 description"
 //        );
-//        workspaceRepository.save(workspace1);
+//        workspaceRepository.save(workspace2);
 //
 //
 //        UserWorkspace userWorkspace1 = new UserWorkspace(

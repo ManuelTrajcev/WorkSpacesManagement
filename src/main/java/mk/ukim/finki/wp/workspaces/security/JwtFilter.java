@@ -34,6 +34,11 @@ public class JwtFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         String authorizationHeader = request.getHeader("Authorization");
 
+        if (request.getRequestURI().startsWith("/swagger-ui") || request.getRequestURI().startsWith("/v3/api-docs")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         if (authorizationHeader == null || !authorizationHeader.startsWith(JwtConstants.TOKEN_PREFIX)) {
             filterChain.doFilter(request, response);
             return;
@@ -51,7 +56,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             User user = userService.findByUsername(username);
 
-            if(jwtHelper.isValid(token, user)) {
+            if (jwtHelper.isValid(token, user)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         user,
                         null,

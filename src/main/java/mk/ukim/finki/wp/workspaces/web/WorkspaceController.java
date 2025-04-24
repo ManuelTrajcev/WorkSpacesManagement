@@ -4,9 +4,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import mk.ukim.finki.wp.workspaces.dto.DisplayWorkspaceDto;
 import mk.ukim.finki.wp.workspaces.model.domain.User;
+import mk.ukim.finki.wp.workspaces.model.exceptions.AccessDeniedException;
 import mk.ukim.finki.wp.workspaces.service.application.WorkspaceApplicationService;
 import mk.ukim.finki.wp.workspaces.service.application.impl.WorkspaceApplicationServiceImpl;
 import mk.ukim.finki.wp.workspaces.service.domain.WorkspaceService;
+import org.springdoc.api.ErrorMessage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,11 +38,13 @@ public class WorkspaceController {
     @Operation(summary = "Access a workspaces", description = "Access one workspace.")
     @GetMapping("/{id}")
     public ResponseEntity<DisplayWorkspaceDto> accessWorkspace(@PathVariable Long id) {
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User loggedInUser = (User) authentication.getPrincipal();
 
         return workspaceApplicationService.openWorkspace(id, loggedInUser.getId())
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+
     }
 }
