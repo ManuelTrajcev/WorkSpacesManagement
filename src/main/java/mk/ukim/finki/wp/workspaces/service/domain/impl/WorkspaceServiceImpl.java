@@ -27,7 +27,17 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Override
     public Optional<Workspace> openWorkspace(Long workspaceId, Long userId) {
-        Optional<UserWorkspace>  userWorkspace= Optional.of(userWorkspaceRepository.findByUserIdAndWorkspaceId(workspaceId, userId));
+        Optional<UserWorkspace> userWorkspace = userWorkspaceRepository.findByWorkspaceIdAndUserId(workspaceId, userId);
+        if (userWorkspace.isEmpty()) {
+            throw new IllegalArgumentException("Workspace not found");
+        }
+        Optional<Workspace> workspace = workspaceRepository.findById(userWorkspace.get().getWorkspace().getId());
+        return workspace;
+    }
+
+    @Override
+    public Optional<Workspace> editWorkspace(Long workspaceId, Long userId) {
+        Optional<UserWorkspace> userWorkspace = userWorkspaceRepository.findByWorkspaceIdAndUserId(workspaceId, userId);
         if (userWorkspace.isEmpty()) {
             throw new IllegalArgumentException("Workspace not found");
         }

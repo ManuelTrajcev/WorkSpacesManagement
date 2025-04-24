@@ -59,7 +59,8 @@ public class JwtSecurityWebConfig {
                         sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(workspaceAccessFilter, JwtFilter.class);
 
         return http.build();
     }

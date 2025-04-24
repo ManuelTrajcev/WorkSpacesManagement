@@ -3,6 +3,7 @@ package mk.ukim.finki.wp.workspaces.web;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import mk.ukim.finki.wp.workspaces.dto.DisplayWorkspaceDto;
+import mk.ukim.finki.wp.workspaces.dto.EditWorkspaceDto;
 import mk.ukim.finki.wp.workspaces.model.domain.User;
 import mk.ukim.finki.wp.workspaces.model.exceptions.AccessDeniedException;
 import mk.ukim.finki.wp.workspaces.service.application.WorkspaceApplicationService;
@@ -43,6 +44,19 @@ public class WorkspaceController {
         User loggedInUser = (User) authentication.getPrincipal();
 
         return workspaceApplicationService.openWorkspace(id, loggedInUser.getId())
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+
+    }
+
+    @Operation(summary = "Edit a workspaces", description = "Edit one workspace.")
+    @GetMapping("/edit/{id}")
+    public ResponseEntity<EditWorkspaceDto> editWorkspace(@PathVariable Long id) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User loggedInUser = (User) authentication.getPrincipal();
+
+        return workspaceApplicationService.editWorkspace(id, loggedInUser.getId())
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
 

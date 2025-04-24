@@ -32,7 +32,7 @@ public class WorkspaceAccessFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return !path.matches("/api/workspace/\\d+");
+        return !(path.matches("/api/workspace/\\d+") || path.matches("/api/workspace/edit/\\d+"));
     }
 
 
@@ -43,6 +43,7 @@ public class WorkspaceAccessFilter extends OncePerRequestFilter {
             FilterChain filterChain)
             throws ServletException, IOException {
         String path = request.getRequestURI();
+
 
         if (path.matches("/api/workspace/\\d+")) {
             String authHeader = request.getHeader("Authorization");
@@ -66,10 +67,49 @@ public class WorkspaceAccessFilter extends OncePerRequestFilter {
 
                     if (!claims.containsKey(workspaceId)) {
 //                        throw new AccessDeniedException("Access denied: you don't have permission for the workspace " + workspace.get().getName(), HttpServletResponse.SC_FORBIDDEN);
-                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                         response.getWriter().write("Access denied: you don't have permission for the workspace " + workspace.get().getName());
                         return;
+                    }
+                }
+            } else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Missing or invalid Authorization header");
+                return;
+            }
+        } else if (path.matches("/api/workspace/edit/\\d+")) {
+            String authHeader = request.getHeader("Authorization");
 
+            if (authHeader != null && authHeader.startsWith(JwtConstants.TOKEN_PREFIX)) {
+                String token = authHeader.substring(JwtConstants.TOKEN_PREFIX.length());
+                Map<Long, String> claims = jwtHelper.extractWorkspaceAccess(token);
+
+                Pattern pattern = Pattern.compile("/api/workspace/edit/(\\d+)");
+                Matcher matcher = pattern.matcher(path);
+
+                if (matcher.find()) {
+                    Long workspaceId = Long.parseLong(matcher.group(1));
+                    Optional<Workspace> workspace = workspaceService.findById(workspaceId);
+
+                    if (workspace.isEmpty()) {
+                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                        response.getWriter().write("Workspace does not exists ");
+                        return;
+                    }
+
+                    if (!claims.containsKey(workspaceId)) {
+                        //TODO throw exception with custom message to be catched in the GlobalExceptionHandler
+//                        throw new AccessDeniedException("Access denied: you don't have permission for the workspace " + workspace.get().getName(), HttpServletResponse.SC_FORBIDDEN);
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        response.getWriter().write("Access denied: you don't have permission for the workspace " + workspace.get().getName());
+                        return;
+                    }
+
+                    String role = claims.get(workspaceId);
+                    if (role == null || !role.equalsIgnoreCase("ROLE_ADMIN")) {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        response.getWriter().write("Access denied: you must be an ADMIN for workspace " + workspace.get().getName() + " to edit it");
+                        return;
                     }
                 }
             } else {
@@ -78,6 +118,7 @@ public class WorkspaceAccessFilter extends OncePerRequestFilter {
                 return;
             }
         }
+
         filterChain.doFilter(request, response);
     }
 }

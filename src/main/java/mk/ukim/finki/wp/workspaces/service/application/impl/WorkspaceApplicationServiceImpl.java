@@ -1,6 +1,8 @@
 package mk.ukim.finki.wp.workspaces.service.application.impl;
 
 import mk.ukim.finki.wp.workspaces.dto.DisplayWorkspaceDto;
+import mk.ukim.finki.wp.workspaces.dto.EditWorkspaceDto;
+import mk.ukim.finki.wp.workspaces.model.domain.Workspace;
 import mk.ukim.finki.wp.workspaces.service.application.WorkspaceApplicationService;
 import mk.ukim.finki.wp.workspaces.service.domain.WorkspaceService;
 import org.springframework.stereotype.Service;
@@ -27,9 +29,16 @@ public class WorkspaceApplicationServiceImpl implements WorkspaceApplicationServ
     }
 
     @Override
-    public Optional<DisplayWorkspaceDto> openWorkspace(Long id, Long userId) {
-       return Optional.ofNullable(workspaceService.openWorkspace(id, userId)
-               .map(DisplayWorkspaceDto::from)
-               .orElseThrow(() -> new RuntimeException("Workspace not found")));
+    public Optional<DisplayWorkspaceDto> openWorkspace(Long workspaceId, Long userId) {
+        return Optional.ofNullable(workspaceService.openWorkspace(workspaceId, userId)
+                .map(DisplayWorkspaceDto::from)
+                .orElseThrow(() -> new RuntimeException("Workspace not found")));
+    }
+
+    @Override
+    public Optional<EditWorkspaceDto> editWorkspace(Long workspaceId, Long userId) {
+        return Optional.ofNullable(workspaceService.editWorkspace(workspaceId, userId)
+                .map(EditWorkspaceDto::from)
+                .orElseThrow(() -> new RuntimeException("Workspace not found")));
     }
 }

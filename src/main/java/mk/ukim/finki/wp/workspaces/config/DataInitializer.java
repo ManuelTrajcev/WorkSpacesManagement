@@ -38,12 +38,24 @@ public class DataInitializer {
 //                passwordEncoder.encode("mt"));
 //        userRepository.save(user1);
 //
+//        Workspace workspace1 = new Workspace(
+//                "workspace1",
+//                "workspace1 description"
+//        );
+//        workspaceRepository.save(workspace1);
+//
 //        Workspace workspace2 = new Workspace(
 //                "workspace2",
 //                "workspace2 description"
 //        );
 //        workspaceRepository.save(workspace2);
 //
+//
+//        Workspace workspace3 = new Workspace(
+//                "workspace3",
+//                "workspace3 description"
+//        );
+//        workspaceRepository.save(workspace3);
 //
 //        UserWorkspace userWorkspace1 = new UserWorkspace(
 //                user1,
@@ -52,5 +64,13 @@ public class DataInitializer {
 //        );
 //
 //        userWorkspaceRepository.save(userWorkspace1);
+//
+//        UserWorkspace userWorkspace2 = new UserWorkspace(
+//                user1,
+//                workspace2,
+//                Role.ROLE_VISITOR
+//        );
+//
+//        userWorkspaceRepository.save(userWorkspace2);
     }
 }
