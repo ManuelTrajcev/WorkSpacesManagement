@@ -5,4 +5,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserWorkspaceRepository extends JpaRepository<UserWorkspace, Long> {
+    UserWorkspace findByUserIdAndWorkspaceId(Long userId, Long workspaceId);
 }

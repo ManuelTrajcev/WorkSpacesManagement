@@ -24,7 +24,7 @@ public class UserWorkspaceServiceImpl implements UserWorkspaceService {
         Map<Long, Role> claims  = list.stream()
                 .filter(uw -> uw.getUser().getId().equals(id))
                 .collect(Collectors.toMap(
-                        UserWorkspace::getId,
+                        uv -> uv.getWorkspace().getId(),
                         UserWorkspace::getRole
                 ));
         return claims;

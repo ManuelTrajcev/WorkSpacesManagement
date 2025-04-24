@@ -51,18 +51,8 @@ public class UserApplicationServiceImpl implements UserApplicationService {
                 loginUserDto.password()
         );
 
-//        Map<String, Object> claims = new HashMap<>();
-//        claims.put("username", user.getUsername());
-//        claims.put("userId", user.getId());
-
-//        claims.put("workspaces", user.getUserWorkspaces().stream()
-//                .map(uw -> Map.of("id", uw.getWorkspace().getId(), "role", uw.getRole()))
-//                .collect(Collectors.toList()));
-
-
-        //TODO: add map with user-workspaces
         Map<Long, Role> claims =userWorkspaceService.workspacesWithRolesForUser(user.getId());
-        String token = jwtHelper.generateTokenWithWorkspacesAccess(user, claims);
+        String token = jwtHelper.generateTokenWithWorkspacesAccess(user, claims);       //workspaceId, Role
         return Optional.of(new LoginResponseDto(token));
     }
 

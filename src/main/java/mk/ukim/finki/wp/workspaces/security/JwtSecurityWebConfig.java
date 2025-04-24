@@ -57,13 +57,11 @@ public class JwtSecurityWebConfig {
                                 )
                                 .permitAll()
                                 .requestMatchers(
-                                        "/api/categories",
+                                        "/api/workspace/**",
                                         "/api/manufacturers",
                                         "/api/products"
                                 )
-                                .hasAnyRole("USER", "ADMIN")
-                                .anyRequest()
-                                .hasRole("ADMIN")
+                                .authenticated()
                 )
                 .sessionManagement(sessionManagementConfigurer ->
                         sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
