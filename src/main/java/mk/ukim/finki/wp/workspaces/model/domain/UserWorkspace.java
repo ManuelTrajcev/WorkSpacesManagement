@@ -27,4 +27,8 @@ public class UserWorkspace {
         this.workspace = workspace;
         this.role = role;
     }
+
+    public String getRoleString() {
+        return role.name();
+    }
 }

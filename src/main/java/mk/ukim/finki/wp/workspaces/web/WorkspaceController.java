@@ -11,12 +11,10 @@ import mk.ukim.finki.wp.workspaces.service.application.impl.WorkspaceApplication
 import mk.ukim.finki.wp.workspaces.service.domain.WorkspaceService;
 import org.springdoc.api.ErrorMessage;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,35 +28,45 @@ public class WorkspaceController {
         this.workspaceApplicationService = workspaceApplicationService;
     }
 
-    @Operation(summary = "Get all workspaces", description = "Retrieves a list of all workspace.")
-    @GetMapping
-    public List<DisplayWorkspaceDto> findAll() {
-        return workspaceApplicationService.findAll();
-    }
-
-    @Operation(summary = "Access a workspaces", description = "Access one workspace.")
+    @Operation(summary = "Access a workspace", description = "Access one workspace.")
+    @PreAuthorize("@workspacePermissionEvaluator.hasAccess(authentication, #id, null)")
     @GetMapping("/{id}")
-    public ResponseEntity<DisplayWorkspaceDto> accessWorkspace(@PathVariable Long id) {
+    public ResponseEntity<DisplayWorkspaceDto> accessWorkspace(
+            @PathVariable Long id,
+            @RequestHeader(value = "X-Workspace-Id", required = false) Long workspaceIdHeader) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User loggedInUser = (User) authentication.getPrincipal();
+
+        if (workspaceIdHeader != null) {
+            System.out.println("X-Workspace-Id received: " + workspaceIdHeader);
+        } else {
+            System.out.println("X-Workspace-Id header is missing");
+        }
 
         return workspaceApplicationService.openWorkspace(id, loggedInUser.getId())
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
-
     }
 
-    @Operation(summary = "Edit a workspaces", description = "Edit one workspace.")
+    @Operation(summary = "Edit a workspace", description = "Edit one workspace.")
+    @PreAuthorize("@workspacePermissionEvaluator.hasAccess(authentication, #id, 'ROLE_ADMIN')")
     @GetMapping("/edit/{id}")
-    public ResponseEntity<EditWorkspaceDto> editWorkspace(@PathVariable Long id) {
+    public ResponseEntity<EditWorkspaceDto> editWorkspace(@PathVariable Long id,
+                                                          @RequestHeader(value = "X-Workspace-Id", required = false) Long workspaceIdHeader
+    ) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User loggedInUser = (User) authentication.getPrincipal();
 
+        if (workspaceIdHeader != null) {
+            System.out.println("X-Workspace-Id received: " + workspaceIdHeader);
+        } else {
+            System.out.println("X-Workspace-Id header is missing");
+        }
+
         return workspaceApplicationService.editWorkspace(id, loggedInUser.getId())
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
-
     }
 }

@@ -1,4 +1,4 @@
-package mk.ukim.finki.wp.workspaces.security;
+package mk.ukim.finki.wp.workspaces.securityJwt;
 
 public class JwtConstants {
     public static final String SECRET_KEY = "7ac51f34954d17b2c22a1a95ea44f1f61c72a0b87d186c8e2c607edb4db99ffd";
