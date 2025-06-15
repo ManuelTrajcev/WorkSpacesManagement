@@ -3,6 +3,7 @@ package mk.ukim.finki.wp.workspaces.service.domain;
 import mk.ukim.finki.wp.workspaces.dto.CreateWorkspaceDto;
 import mk.ukim.finki.wp.workspaces.dto.DisplayWorkspaceDto;
 import mk.ukim.finki.wp.workspaces.model.domain.User;
+import mk.ukim.finki.wp.workspaces.model.domain.UserWorkspace;
 import mk.ukim.finki.wp.workspaces.model.domain.Workspace;
 import mk.ukim.finki.wp.workspaces.model.enumerations.Role;
 
@@ -18,4 +19,7 @@ public interface WorkspaceService {
     Optional<Workspace> editWorkspace(Long workspaceId, Long userId);
 
     Optional<Workspace> findById(Long workspaceId);
+
+    List<UserWorkspace> findAllPerUser(Long userId);
+
 }

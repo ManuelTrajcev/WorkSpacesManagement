@@ -1,6 +1,5 @@
 package mk.ukim.finki.wp.workspaces.web;
 
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -8,13 +7,19 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import mk.ukim.finki.wp.workspaces.dto.CreateUserDto;
 import mk.ukim.finki.wp.workspaces.dto.DisplayUserDto;
-import mk.ukim.finki.wp.workspaces.dto.LoginResponseDto;
 import mk.ukim.finki.wp.workspaces.dto.LoginUserDto;
 import mk.ukim.finki.wp.workspaces.model.exceptions.InvalidArgumentsException;
 import mk.ukim.finki.wp.workspaces.model.exceptions.InvalidUserCredentialsException;
 import mk.ukim.finki.wp.workspaces.model.exceptions.PasswordsDoNotMatchException;
 import mk.ukim.finki.wp.workspaces.service.application.UserApplicationService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,9 +28,12 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserApplicationService userApplicationService;
+    private final AuthenticationManager authenticationManager;
 
-    public UserController(UserApplicationService userApplicationService) {
+    public UserController(UserApplicationService userApplicationService,
+                          AuthenticationManager authenticationManager) {
         this.userApplicationService = userApplicationService;
+        this.authenticationManager = authenticationManager;
     }
 
     @Operation(summary = "Register a new user", description = "Creates a new user account")
@@ -48,22 +56,22 @@ public class UserController {
         }
     }
 
-    @Operation(summary = "User login", description = "Authenticates a user and starts a session")
-    @ApiResponses(
-            value = {@ApiResponse(
-                    responseCode = "200",
-                    description = "User authenticated successfully"
-            ), @ApiResponse(responseCode = "404", description = "Invalid username or password")}
-    )
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(LoginUserDto loginUserDto) {
+    public ResponseEntity<DisplayUserDto> login(@RequestBody LoginUserDto loginUserDto, HttpServletRequest request) {
         try {
-            return userApplicationService.login(loginUserDto)
-                    .map(ResponseEntity::ok)
-                    .orElseThrow(InvalidUserCredentialsException::new);
+            UsernamePasswordAuthenticationToken authToken =
+                    new UsernamePasswordAuthenticationToken(loginUserDto.username(), loginUserDto.password());
 
-        } catch (InvalidUserCredentialsException e) {
-            return ResponseEntity.notFound().build();
+            Authentication authentication = authenticationManager.authenticate(authToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            request.getSession(true);
+
+            DisplayUserDto dto = userApplicationService.getDisplayUserDto(authentication.getName());
+            return ResponseEntity.ok(dto);
+
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 
@@ -72,5 +80,14 @@ public class UserController {
     @GetMapping("/logout")
     public void logout(HttpServletRequest request) {
         request.getSession().invalidate();
+        SecurityContextHolder.clearContext();
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<DisplayUserDto> me(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(userApplicationService.getDisplayUserDto(authentication.getName()));
     }
 }

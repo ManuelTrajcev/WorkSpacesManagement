@@ -49,4 +49,10 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public Optional<Workspace> findById(Long workspaceId) {
         return workspaceRepository.findById(workspaceId);
     }
+
+    @Override
+    public List<UserWorkspace> findAllPerUser(Long userId) {
+
+        return userWorkspaceRepository.findAllByUserId(userId);
+    }
 }

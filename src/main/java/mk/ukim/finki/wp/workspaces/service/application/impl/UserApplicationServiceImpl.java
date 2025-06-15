@@ -2,32 +2,31 @@ package mk.ukim.finki.wp.workspaces.service.application.impl;
 
 import mk.ukim.finki.wp.workspaces.dto.CreateUserDto;
 import mk.ukim.finki.wp.workspaces.dto.DisplayUserDto;
-import mk.ukim.finki.wp.workspaces.dto.LoginResponseDto;
 import mk.ukim.finki.wp.workspaces.dto.LoginUserDto;
 import mk.ukim.finki.wp.workspaces.model.domain.User;
-import mk.ukim.finki.wp.workspaces.model.enumerations.Role;
 import mk.ukim.finki.wp.workspaces.repository.UserWorkspaceRepository;
-//import mk.ukim.finki.wp.workspaces.securityJwt.JwtHelper;
+import jakarta.servlet.http.HttpServletRequest;
 import mk.ukim.finki.wp.workspaces.service.application.UserApplicationService;
 import mk.ukim.finki.wp.workspaces.service.domain.UserService;
 import mk.ukim.finki.wp.workspaces.service.domain.UserWorkspaceService;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
 import java.util.Optional;
 
 @Service
 public class UserApplicationServiceImpl implements UserApplicationService {
     private final UserService userService;
-    //private final JwtHelper jwtHelper;
     private final UserWorkspaceRepository userWorkspaceRepository;
     private final UserWorkspaceService userWorkspaceService;
+    private final AuthenticationManager authenticationManager;
 
-    public UserApplicationServiceImpl(UserService userService,  UserWorkspaceRepository userWorkspaceRepository, UserWorkspaceService userWorkspaceService) {
+
+    public UserApplicationServiceImpl(UserService userService, UserWorkspaceRepository userWorkspaceRepository, UserWorkspaceService userWorkspaceService, AuthenticationManager authenticationManager) {
         this.userService = userService;
-       // this.jwtHelper = jwtHelper;
         this.userWorkspaceRepository = userWorkspaceRepository;
         this.userWorkspaceService = userWorkspaceService;
+        this.authenticationManager = authenticationManager;
     }
 
 
@@ -43,7 +42,7 @@ public class UserApplicationServiceImpl implements UserApplicationService {
     }
 
     @Override
-    public Optional<LoginResponseDto> login(LoginUserDto loginUserDto) {
+    public Optional<DisplayUserDto> login(LoginUserDto loginUserDto) {
         User user = userService.login(
                 loginUserDto.username(),
                 loginUserDto.password()
@@ -51,11 +50,19 @@ public class UserApplicationServiceImpl implements UserApplicationService {
 
         //Map<Long, Role> claims =userWorkspaceService.workspacesWithRolesForUser(user.getId());
         //String token = jwtHelper.generateTokenWithWorkspacesAccess(user, claims);       //workspaceId, Role
-        return Optional.of(new LoginResponseDto("empty"));
+        return Optional.of(DisplayUserDto.from(userService.login(
+                loginUserDto.username(),
+                loginUserDto.password()
+        )));
     }
 
     @Override
     public Optional<DisplayUserDto> findByUsername(String username) {
         return Optional.of(DisplayUserDto.from(userService.findByUsername(username)));
+    }
+
+    @Override
+    public DisplayUserDto getDisplayUserDto(String username) {
+        return DisplayUserDto.from(userService.findByUsername(username));
     }
 }

@@ -2,6 +2,7 @@ package mk.ukim.finki.wp.workspaces.service.application.impl;
 
 import mk.ukim.finki.wp.workspaces.dto.DisplayWorkspaceDto;
 import mk.ukim.finki.wp.workspaces.dto.EditWorkspaceDto;
+import mk.ukim.finki.wp.workspaces.dto.WorkspaceWithRoleDto;
 import mk.ukim.finki.wp.workspaces.model.domain.Workspace;
 import mk.ukim.finki.wp.workspaces.service.application.WorkspaceApplicationService;
 import mk.ukim.finki.wp.workspaces.service.domain.WorkspaceService;
@@ -40,5 +41,14 @@ public class WorkspaceApplicationServiceImpl implements WorkspaceApplicationServ
         return Optional.ofNullable(workspaceService.editWorkspace(workspaceId, userId)
                 .map(EditWorkspaceDto::from)
                 .orElseThrow(() -> new RuntimeException("Workspace not found")));
+    }
+
+    @Override
+    public List<WorkspaceWithRoleDto> findAllPerUser(Long userId) {
+        return workspaceService
+                .findAllPerUser(userId)
+                .stream()
+                .map(WorkspaceWithRoleDto::from)
+                .toList();
     }
 }
