@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import mk.ukim.finki.wp.workspaces.dto.DisplayWorkspaceDto;
 import mk.ukim.finki.wp.workspaces.dto.EditWorkspaceDto;
+import mk.ukim.finki.wp.workspaces.dto.WorkspaceWithRoleDto;
 import mk.ukim.finki.wp.workspaces.model.domain.User;
 import mk.ukim.finki.wp.workspaces.model.exceptions.AccessDeniedException;
 import mk.ukim.finki.wp.workspaces.service.application.WorkspaceApplicationService;
@@ -34,6 +35,15 @@ public class WorkspaceController {
     @GetMapping
     public List<DisplayWorkspaceDto> findAll() {
         return workspaceApplicationService.findAll();
+    }
+
+    @Operation(summary = "Get my workspaces", description = "Retrieves a list of all of my workspaces.")
+    @GetMapping("/my-workspaces")
+    public List<WorkspaceWithRoleDto> findMyWorkspaces() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User loggedInUser = (User) authentication.getPrincipal();
+
+        return workspaceApplicationService.findAllPerUser(loggedInUser.getId());
     }
 
     @Operation(summary = "Access a workspaces", description = "Access one workspace.")

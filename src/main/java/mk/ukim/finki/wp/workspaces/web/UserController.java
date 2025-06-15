@@ -56,7 +56,7 @@ public class UserController {
             ), @ApiResponse(responseCode = "404", description = "Invalid username or password")}
     )
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(LoginUserDto loginUserDto) {
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginUserDto loginUserDto) {
         try {
             return userApplicationService.login(loginUserDto)
                     .map(ResponseEntity::ok)

@@ -4,6 +4,7 @@ import mk.ukim.finki.wp.workspaces.model.domain.UserWorkspace;
 import mk.ukim.finki.wp.workspaces.model.domain.Workspace;
 import mk.ukim.finki.wp.workspaces.repository.UserWorkspaceRepository;
 import mk.ukim.finki.wp.workspaces.repository.WorkspaceRepository;
+import mk.ukim.finki.wp.workspaces.service.domain.UserWorkspaceService;
 import mk.ukim.finki.wp.workspaces.service.domain.WorkspaceService;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +15,12 @@ import java.util.Optional;
 public class WorkspaceServiceImpl implements WorkspaceService {
     private final WorkspaceRepository workspaceRepository;
     private final UserWorkspaceRepository userWorkspaceRepository;
+    private final UserWorkspaceService userWorkspaceService;
 
-    public WorkspaceServiceImpl(WorkspaceRepository workspaceRepository, UserWorkspaceRepository userWorkspaceRepository) {
+    public WorkspaceServiceImpl(WorkspaceRepository workspaceRepository, UserWorkspaceRepository userWorkspaceRepository, UserWorkspaceService userWorkspaceService) {
         this.workspaceRepository = workspaceRepository;
         this.userWorkspaceRepository = userWorkspaceRepository;
+        this.userWorkspaceService = userWorkspaceService;
     }
 
     @Override
@@ -48,5 +51,11 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     @Override
     public Optional<Workspace> findById(Long workspaceId) {
         return workspaceRepository.findById(workspaceId);
+    }
+
+    @Override
+    public List<UserWorkspace> findAllPerUser(Long userId) {
+
+        return userWorkspaceRepository.findAllByUserId(userId);
     }
 }

@@ -50,7 +50,7 @@ public class JwtSecurityWebConfig {
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorizeHttpRequestsCustomizer ->
                         authorizeHttpRequestsCustomizer
-                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/user/**")
+                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/user/**", "/api/user/login/**","/api/user/register/**")
                                 .permitAll()
                                 .requestMatchers("/api/workspace/**", "/api/", "/api/")
                                 .authenticated()
