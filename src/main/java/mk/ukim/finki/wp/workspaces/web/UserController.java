@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 import mk.ukim.finki.wp.workspaces.dto.CreateUserDto;
 import mk.ukim.finki.wp.workspaces.dto.DisplayUserDto;
 import mk.ukim.finki.wp.workspaces.dto.LoginUserDto;
@@ -56,6 +58,7 @@ public class UserController {
         }
     }
 
+    @Transactional
     @PostMapping("/login")
     public ResponseEntity<DisplayUserDto> login(@RequestBody LoginUserDto loginUserDto, HttpServletRequest request) {
         try {
@@ -65,7 +68,11 @@ public class UserController {
             Authentication authentication = authenticationManager.authenticate(authToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            request.getSession(true);
+            HttpSession session = request.getSession(true);
+            session.setAttribute(
+                    "SPRING_SECURITY_CONTEXT",
+                    SecurityContextHolder.getContext()
+            );
 
             DisplayUserDto dto = userApplicationService.getDisplayUserDto(authentication.getName());
             return ResponseEntity.ok(dto);

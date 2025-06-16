@@ -1,6 +1,7 @@
 package mk.ukim.finki.wp.workspaces.securityABAC;
 
 import mk.ukim.finki.wp.workspaces.config.CustomUsernamePasswordAuthenticationProvider;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,7 +17,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.filter.OncePerRequestFilter;
 
+import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -38,7 +46,7 @@ public class ABACSecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/user/**").permitAll()
                         .requestMatchers("/api/workspace/**").authenticated()
@@ -46,9 +54,7 @@ public class ABACSecurityConfig {
                 )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(workspaceContextFilter, UsernamePasswordAuthenticationFilter.class)
-
-                .httpBasic(Customizer.withDefaults()); // Enables session-based auth support
-                //.formLogin(Customizer.withDefaults());
+                .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }
@@ -57,11 +63,10 @@ public class ABACSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:3000"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
-        config.setAllowedHeaders(List.of("Content-Type", "Authorization"));
         config.setExposedHeaders(List.of("Set-Cookie"));
+        config.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
@@ -70,5 +75,29 @@ public class ABACSecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class).build();
+    }
+
+    @Bean
+    public FilterRegistrationBean<OncePerRequestFilter> sameSiteCookieFilter() {
+        FilterRegistrationBean<OncePerRequestFilter> registration = new FilterRegistrationBean<>();
+        registration.setFilter(new OncePerRequestFilter() {
+            @Override
+            protected void doFilterInternal(HttpServletRequest request,
+                                            HttpServletResponse response,
+                                            FilterChain filterChain) throws ServletException, IOException {
+                filterChain.doFilter(request, response);
+
+                Collection<String> headers = response.getHeaders("Set-Cookie");
+                if (headers == null || headers.isEmpty()) return;
+
+                for (String header : headers) {
+                    if (!header.toLowerCase().contains("samesite")) {
+                        response.setHeader("Set-Cookie", header + "; SameSite=Lax");
+                    }
+                }
+            }
+        });
+        registration.addUrlPatterns("/*");
+        return registration;
     }
 }
