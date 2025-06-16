@@ -67,9 +67,10 @@ public class WorkspaceController {
 
     @Operation(summary = "Edit a workspace", description = "Edit one workspace.")
     @PreAuthorize("@workspacePermissionEvaluator.hasAccess(authentication, #id, 'ROLE_ADMIN')")
-    @GetMapping("/edit/{id}")
+    @PostMapping("/edit/{id}")
     public ResponseEntity<EditWorkspaceDto> editWorkspace(@PathVariable Long id,
-                                                          @RequestHeader(value = "X-Workspace-Id", required = false) Long workspaceIdHeader
+                                                          @RequestHeader(value = "X-Workspace-Id", required = false) Long workspaceIdHeader,
+                                                          @RequestBody EditWorkspaceDto editWorkspaceDto
     ) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -81,7 +82,7 @@ public class WorkspaceController {
             System.out.println("X-Workspace-Id header is missing");
         }
 
-        return workspaceApplicationService.editWorkspace(id, loggedInUser.getId())
+        return workspaceApplicationService.editWorkspace(id, loggedInUser.getId(), editWorkspaceDto)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

@@ -4,14 +4,12 @@ import mk.ukim.finki.wp.workspaces.model.domain.Workspace;
 
 public record EditWorkspaceDto(
         String name,
-        String description,
-        Boolean hasPermissionToEdit
+        String description
 ) {
     public static EditWorkspaceDto from(Workspace workspace) {
         return new EditWorkspaceDto(
                 workspace.getName(),
-                workspace.getDescription(),
-                true
+                workspace.getDescription()
         );
     }
 
