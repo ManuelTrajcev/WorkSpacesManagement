@@ -11,8 +11,7 @@ public interface WorkspaceService {
 
     Optional<Workspace> openWorkspace(Long workspaceId, Long userId);
 
-    Optional<Workspace> editWorkspace(Long workspaceId, Long userId);
-
+    Optional<Workspace> editWorkspace(Long workspaceId, Long userId, Workspace editWorkspace);
     Optional<Workspace> findById(Long workspaceId);
 
     List<UserWorkspace> findAllPerUser(Long userId);

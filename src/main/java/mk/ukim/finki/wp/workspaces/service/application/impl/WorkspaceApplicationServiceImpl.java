@@ -36,8 +36,8 @@ public class WorkspaceApplicationServiceImpl implements WorkspaceApplicationServ
     }
 
     @Override
-    public Optional<EditWorkspaceDto> editWorkspace(Long workspaceId, Long userId) {
-        return Optional.ofNullable(workspaceService.editWorkspace(workspaceId, userId)
+    public Optional<EditWorkspaceDto> editWorkspace(Long workspaceId, Long userId, EditWorkspaceDto editWorkspaceDto) {
+        return Optional.ofNullable(workspaceService.editWorkspace(workspaceId, userId, editWorkspaceDto.toWorkspace())
                 .map(EditWorkspaceDto::from)
                 .orElseThrow(() -> new RuntimeException("Workspace not found")));
     }

@@ -8,12 +8,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public record WorkspaceWithRoleDto(
+        Long id,
         String name,
         String description,
         Role role
 ) {
     public static WorkspaceWithRoleDto from(UserWorkspace userWorkspace) {
         return new WorkspaceWithRoleDto(
+                userWorkspace.getWorkspace().getId(),
                 userWorkspace.getWorkspace().getName(),
                 userWorkspace.getWorkspace().getDescription(),
                 userWorkspace.getRole()

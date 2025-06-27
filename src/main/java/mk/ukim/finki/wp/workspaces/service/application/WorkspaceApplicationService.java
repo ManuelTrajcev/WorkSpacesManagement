@@ -10,7 +10,6 @@ import java.util.Optional;
 public interface WorkspaceApplicationService {
     List<DisplayWorkspaceDto> findAll();
     Optional<DisplayWorkspaceDto> openWorkspace(Long workspaceId, Long userId);
-    Optional<EditWorkspaceDto> editWorkspace(Long workspaceId, Long userId);
-
+    Optional<EditWorkspaceDto> editWorkspace(Long workspaceId, Long userId, EditWorkspaceDto editWorkspaceDto);
     List<WorkspaceWithRoleDto> findAllPerUser(Long userId);
 }
