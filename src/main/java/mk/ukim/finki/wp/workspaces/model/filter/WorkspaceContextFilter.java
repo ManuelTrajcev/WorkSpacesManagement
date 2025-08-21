@@ -10,7 +10,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-@Component
+//@Component
 public class WorkspaceContextFilter extends OncePerRequestFilter {
 
     @Override

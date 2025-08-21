@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtHelper {
@@ -48,6 +49,16 @@ public class JwtHelper {
         return extractClaim(token, Claims::getExpiration);
     }
 
+    @SuppressWarnings("unchecked")
+    public Map<Long, String> extractWorkspaceAccess(String token) {
+        Map<String, String> raw = extractClaim(token, claims -> (Map<String, String>) claims.get("workspaceAccess"));
+
+        return raw.entrySet().stream()
+                .collect(Collectors.toMap(
+                        e -> Long.parseLong(e.getKey()),
+                        Map.Entry::getValue
+                ));
+    }
     public String buildToken(
             Map<String, Object> extraClaims,
             String subject,

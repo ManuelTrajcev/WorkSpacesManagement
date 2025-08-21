@@ -1,6 +1,7 @@
 package mk.ukim.finki.wp.workspaces.security;
 
 import mk.ukim.finki.wp.workspaces.config.CustomUsernamePasswordAuthenticationProvider;
+import mk.ukim.finki.wp.workspaces.filter.WorkspaceAccessFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -23,10 +24,12 @@ public class JwtSecurityWebConfig {
 
     private final CustomUsernamePasswordAuthenticationProvider authenticationProvider;
     private final JwtFilter jwtFilter;
+    private final WorkspaceAccessFilter workspaceAccessFilter;
 
-    public JwtSecurityWebConfig(CustomUsernamePasswordAuthenticationProvider authenticationProvider, JwtFilter jwtFilter) {
+    public JwtSecurityWebConfig(CustomUsernamePasswordAuthenticationProvider authenticationProvider, JwtFilter jwtFilter, WorkspaceAccessFilter workspaceAccessFilter) {
         this.authenticationProvider = authenticationProvider;
         this.jwtFilter = jwtFilter;
+        this.workspaceAccessFilter = workspaceAccessFilter;
     }
 
     @Bean
@@ -44,32 +47,21 @@ public class JwtSecurityWebConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(corsCustomizer ->
-                        corsCustomizer.configurationSource(corsConfigurationSource())
-                )
+                .cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorizeHttpRequestsCustomizer ->
                         authorizeHttpRequestsCustomizer
-                                .requestMatchers(
-                                        "/swagger-ui/**",
-                                        "/v3/api-docs/**",
-                                        "/api/user/register",
-                                        "/api/user/login"
-                                )
+                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/user/**", "/api/user/login/**","/api/user/register/**")
                                 .permitAll()
-                                .requestMatchers(
-                                        "/api/categories",
-                                        "/api/manufacturers",
-                                        "/api/products"
-                                )
-                                .hasAnyRole("USER", "ADMIN")
-                                .anyRequest()
-                                .hasRole("ADMIN")
+                                .requestMatchers("/api/workspace/**", "/api/", "/api/")
+                                .authenticated()
                 )
                 .sessionManagement(sessionManagementConfigurer ->
                         sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(workspaceAccessFilter, JwtFilter.class);
+
         return http.build();
     }
 

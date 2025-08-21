@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/user")
-@Tag(name = "User API", description = "Endpoints for user authentication and registration") // Swagger tag
+@Tag(name = "User API", description = "Endpoints for user authentication and registration")
 public class UserController {
 
     private final UserApplicationService userApplicationService;
@@ -56,7 +56,7 @@ public class UserController {
             ), @ApiResponse(responseCode = "404", description = "Invalid username or password")}
     )
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(LoginUserDto loginUserDto) {
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginUserDto loginUserDto) {
         try {
             return userApplicationService.login(loginUserDto)
                     .map(ResponseEntity::ok)
